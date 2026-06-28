@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <!-- Flatpickr CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -26,7 +31,7 @@
         <!-- Gender -->
         <div class="mt-4">
             <x-input-label for="gender" :value="__('Gender')" />
-            <select id="gender" name="gender" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+            <select id="gender" name="gender" class="block mt-1 w-full bg-gray-950 text-white border-gray-800 focus:border-burnt-orange focus:ring-burnt-orange rounded-md shadow-sm" required>
                 <option value="">Select Gender</option>
                 <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                 <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
@@ -45,7 +50,7 @@
         <!-- DOB (Optional) -->
         <div class="mt-4">
             <x-input-label for="dob" :value="__('Date of Birth (Optional)')" />
-            <x-text-input id="dob" class="block mt-1 w-full" type="date" name="dob" :value="old('dob')" />
+            <x-text-input id="dob" class="block mt-1 w-full datepicker" type="text" name="dob" :value="old('dob')" placeholder="DD-MM-YYYY" autocomplete="off" />
             <x-input-error :messages="$errors->get('dob')" class="mt-2" />
         </div>
 
@@ -139,6 +144,14 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Flatpickr for DOB
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",      // Backend format
+            altInput: true,           // Show alternative input
+            altFormat: "d-m-Y",       // User facing format
+            allowInput: true,
+            maxDate: "today"
+        });
         // 1. Password Strength Indicator
         const passwordInput = document.getElementById('password');
         const strengthBar = document.getElementById('password-strength-bar');
