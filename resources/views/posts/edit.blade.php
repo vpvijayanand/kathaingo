@@ -858,11 +858,6 @@
                                              this.showWarningModal = true;
                                              return false;
                                         }
-                                        if (this.hasMajorIssues) {
-                                             this.warningModalType = 'major_issues';
-                                             this.showWarningModal = true;
-                                             return false;
-                                        }
                                         // Sync TinyMCE content to textarea before native submit
                                         if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
                                             tinymce.get('content').save();
