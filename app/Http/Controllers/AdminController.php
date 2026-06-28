@@ -89,6 +89,7 @@ class AdminController extends Controller
         ]);
 
         $user->role = $request->role;
+        $user->is_admin = ($request->role === 'admin');
         $user->save();
 
         return redirect()->back()->with('status', 'User role updated successfully!');
