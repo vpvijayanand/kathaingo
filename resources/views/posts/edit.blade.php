@@ -771,9 +771,10 @@
                                             method: 'POST',
                                             headers: {
                                                 'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                'Accept': 'application/json'
                                             },
-                                            body: JSON.stringify({ text: text })
+                                            body: JSON.stringify({ text: text, language: /[\u0B80-\u0BFF]/.test(text) ? 'ta' : 'en' })
                                         })
                                         .then(res => {
                                             if (!res.ok) throw new Error('API error');
@@ -862,6 +863,10 @@
                                              this.showWarningModal = true;
                                              return false;
                                         }
+                                        // Sync TinyMCE content to textarea before native submit
+                                        if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                                            tinymce.get('content').save();
+                                        }
                                         event.target.submit();
                                     },
 
@@ -869,6 +874,10 @@
                                         this.showWarningModal = false;
                                         this.isReviewed = true;
                                         this.hasMajorIssues = false;
+                                        // Sync TinyMCE content to textarea before native submit
+                                        if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                                            tinymce.get('content').save();
+                                        }
                                         document.getElementById('post-form').submit();
                                     },
 
@@ -1019,7 +1028,10 @@
             routes: {
                 checkBlock: "{{ route('api.writing-assistant.check-block') }}",
                 addDictionary: "{{ route('api.writing-assistant.dictionary.add') }}",
-                suggestWord: "{{ route('api.writing-assistant.suggest-word') }}"
+                suggestWord: "{{ route('api.writing-assistant.suggest-word') }}",
+                learnCorrection: "{{ route('api.writing-assistant.learn-correction') }}",
+                analyzeConsistency: "{{ route('api.writing-assistant.analyze-consistency') }}",
+                reviewArticle: "{{ route('api.writing-assistant.review-article') }}"
             }
         };
 
