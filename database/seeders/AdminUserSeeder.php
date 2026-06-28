@@ -12,15 +12,26 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::firstOrCreate(
+        $user = \App\Models\User::firstOrCreate(
             ['email' => 'admin@kathaingo.com'],
             [
                 'name' => 'Admin User',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => \Illuminate\Support\Facades\Hash::make('Admin@1234'),
                 'is_admin' => true,
                 'is_approved' => true,
+                'role' => 'admin',
                 'email_verified_at' => now(),
             ]
         );
+
+        // If user already existed, ensure they have admin role
+        if (!$user->wasRecentlyCreated) {
+            $user->update([
+                'is_admin' => true,
+                'is_approved' => true,
+                'role' => 'admin',
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ]);
+        }
     }
 }

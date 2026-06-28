@@ -58,6 +58,17 @@
                             name="password"
                             required autocomplete="new-password" />
 
+            <!-- Password Strength Meter -->
+            <div class="mt-2 text-xs" id="password-strength-container">
+                <div class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                    <div id="password-strength-bar" class="h-full bg-gray-500 w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex justify-between mt-1 text-gray-400">
+                    <span id="password-strength-text">Password Strength</span>
+                    <span id="password-strength-requirements" class="hidden sm:inline">8-12 chars, Case, Num, Symbol</span>
+                </div>
+            </div>
+
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -70,6 +81,31 @@
                             name="password_confirmation" required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <!-- Tamil Captcha Human Verification -->
+        <div class="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <x-input-label for="captcha_display" :value="__('Human Verification / மனித சரிபார்ப்பு')" class="text-gray-300 text-sm font-semibold mb-2" />
+            <p class="text-xs text-gray-400 mb-3" id="captcha-question">{{ $captcha['question'] }}</p>
+            
+            <div class="grid grid-cols-4 gap-2 mb-3" id="captcha-options-container">
+                @foreach($captcha['options'] as $option)
+                    <button type="button" class="captcha-option-btn py-2 px-2 bg-gray-750 hover:bg-burnt-orange hover:text-white rounded-md text-base font-bold text-gray-200 transition border border-gray-600" data-val="{{ $option }}">
+                        {{ $option }}
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button type="button" id="btn-refresh-captcha" class="text-xs text-burnt-orange hover:text-orange-400 font-semibold flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12" /></svg>
+                    Refresh Challenge / புதிய எழுத்துக்கள்
+                </button>
+                <span id="captcha-selected-display" class="text-xs text-gray-400">Not selected / தேர்ந்தெடுக்கப்படவில்லை</span>
+            </div>
+
+            <input type="hidden" name="captcha_answer" id="captcha_answer" required />
+            <x-input-error :messages="$errors->get('captcha_answer')" class="mt-2" />
         </div>
 
         <div class="flex items-center justify-end mt-4">
@@ -89,15 +125,120 @@
                 <div class="flex-grow border-t border-gray-400"></div>
             </div>
 
-            <a href="{{ route('social.redirect', 'google') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-600">
+            <a href="{{ route('social.redirect', 'google') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-650">
                 Google
             </a>
-            <a href="{{ route('social.redirect', 'facebook') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-600">
+            <a href="{{ route('social.redirect', 'facebook') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-650">
                 Facebook
             </a>
-            <a href="{{ route('social.redirect', 'linkedin') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-600">
+            <a href="{{ route('social.redirect', 'linkedin') }}" class="flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-burnt-orange hover:bg-orange-650">
                 LinkedIn
             </a>
         </div>
     </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Password Strength Indicator
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('password-strength-bar');
+        const strengthText = document.getElementById('password-strength-text');
+
+        passwordInput.addEventListener('input', function() {
+            const val = passwordInput.value;
+            let score = 0;
+
+            if (val.length >= 8 && val.length <= 12) score += 20;
+            if (/[a-z]/.test(val)) score += 20;
+            if (/[A-Z]/.test(val)) score += 20;
+            if (/\d/.test(val)) score += 20;
+            if (/[^a-zA-Z\d]/.test(val)) score += 20;
+
+            strengthBar.style.width = score + '%';
+            if (val.length === 0) {
+                strengthBar.className = 'h-full bg-gray-500 w-0 transition-all duration-300';
+                strengthText.innerText = 'Password Strength';
+                strengthText.className = 'text-gray-400';
+            } else if (score <= 40) {
+                strengthBar.className = 'h-full bg-red-650 transition-all duration-300';
+                strengthText.innerText = 'Weak Password';
+                strengthText.className = 'text-red-500 font-semibold';
+            } else if (score <= 80) {
+                strengthBar.className = 'h-full bg-yellow-600 transition-all duration-300';
+                strengthText.innerText = 'Medium Password';
+                strengthText.className = 'text-yellow-500 font-semibold';
+            } else {
+                strengthBar.className = 'h-full bg-green-650 transition-all duration-300';
+                strengthText.innerText = 'Strong Password';
+                strengthText.className = 'text-green-500 font-semibold';
+            }
+        });
+
+        // 2. Captcha Buttons Selection
+        const captchaContainer = document.getElementById('captcha-options-container');
+        const captchaInput = document.getElementById('captcha_answer');
+        const captchaSelectedDisplay = document.getElementById('captcha-selected-display');
+        const refreshBtn = document.getElementById('btn-refresh-captcha');
+        const questionText = document.getElementById('captcha-question');
+
+        function bindOptionButtons() {
+            const buttons = document.querySelectorAll('.captcha-option-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => {
+                        b.classList.remove('bg-burnt-orange', 'text-white', 'border-burnt-orange');
+                        b.classList.add('bg-gray-750', 'text-gray-200');
+                    });
+                    
+                    btn.classList.remove('bg-gray-750', 'text-gray-200');
+                    btn.classList.add('bg-burnt-orange', 'text-white', 'border-burnt-orange');
+
+                    const val = btn.getAttribute('data-val');
+                    captchaInput.value = val;
+                    captchaSelectedDisplay.innerText = 'Selected: "' + val + '"';
+                    captchaSelectedDisplay.className = 'text-xs text-green-400 font-semibold';
+                });
+            });
+        }
+
+        bindOptionButtons();
+
+        // 3. Captcha Refresh via AJAX
+        refreshBtn.addEventListener('click', function() {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = 'Loading... / ஏற்றுகிறது...';
+            
+            fetch("{{ route('captcha.refresh') }}")
+                .then(res => res.json())
+                .then(data => {
+                    questionText.innerText = data.question;
+                    captchaContainer.innerHTML = '';
+                    captchaInput.value = '';
+                    captchaSelectedDisplay.innerText = 'Not selected / தேர்ந்தெடுக்கப்படவில்லை';
+                    captchaSelectedDisplay.className = 'text-xs text-gray-400';
+
+                    data.options.forEach(option => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'captcha-option-btn py-2 px-2 bg-gray-750 hover:bg-burnt-orange hover:text-white rounded-md text-base font-bold text-gray-200 transition border border-gray-600';
+                        btn.setAttribute('data-val', option);
+                        btn.innerText = option;
+                        captchaContainer.appendChild(btn);
+                    });
+
+                    bindOptionButtons();
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = `
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3m-3-3v12" /></svg>
+                        Refresh Challenge / புதிய எழுத்துக்கள்
+                    `;
+                })
+                .catch(err => {
+                    console.error(err);
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = 'Error! Try again / பிழை!';
+                });
+        });
+    });
+    </script>
 </x-guest-layout>

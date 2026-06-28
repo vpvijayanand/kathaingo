@@ -9,10 +9,32 @@ use Illuminate\Support\Str;
 
 class SubcategoryController extends Controller
 {
-    public function index()
+    public function reorder(Request $request)
     {
-        $subcategories = Subcategory::with('category')->orderBy('category_id')->orderBy('order')->get();
-        return view('admin.subcategories.index', compact('subcategories'));
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:subcategories,id',
+        ]);
+
+        foreach ($request->ids as $index => $id) {
+            Subcategory::where('id', $id)->update(['order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function index(Request $request)
+    {
+        $query = Subcategory::with('category');
+
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $subcategories = $query->orderBy('category_id')->orderBy('order')->get();
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.subcategories.index', compact('subcategories', 'categories'));
     }
 
     public function create()
@@ -33,7 +55,7 @@ class SubcategoryController extends Controller
         Subcategory::create([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => Str::utf8Slug($request->name),
             'description' => $request->description,
             'order' => $request->order ?? 0,
         ]);
@@ -59,7 +81,7 @@ class SubcategoryController extends Controller
         $subcategory->update([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => Str::utf8Slug($request->name),
             'description' => $request->description,
             'order' => $request->order ?? 0,
         ]);

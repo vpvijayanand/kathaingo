@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+use App\Services\CaptchaService;
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -19,7 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $captcha = app(CaptchaService::class)->generate();
+        return view('auth.register', compact('captcha'));
     }
 
     /**
@@ -36,7 +39,31 @@ class RegisteredUserController extends Controller
             'gender' => ['required', 'string', 'in:male,female,other'],
             'location' => ['nullable', 'string', 'max:255'],
             'dob' => ['nullable', 'date'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'confirmed',
+                Rules\Password::min(8)
+                    ->max(12)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
+                function ($attribute, $value, $fail) {
+                    $commonWeak = ['password', '12345678', 'qwertyui', 'password123', 'admin123', 'welcome123', 'kathaingo123', 'kathaingo'];
+                    if (in_array(strtolower($value), $commonWeak)) {
+                        $fail('The selected password is too weak and easily guessable.');
+                    }
+                }
+            ],
+            'captcha_answer' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!app(CaptchaService::class)->verify($value)) {
+                        $fail('The verification challenge answer is incorrect. Please try again.');
+                    }
+                }
+            ],
         ]);
 
         $user = User::create([
@@ -47,7 +74,8 @@ class RegisteredUserController extends Controller
             'location' => $request->location,
             'dob' => $request->dob,
             'password' => Hash::make($request->password),
-            'is_approved' => false,
+            'is_approved' => true,
+            'role' => 'author',
         ]);
 
         event(new Registered($user));

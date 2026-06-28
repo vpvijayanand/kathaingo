@@ -8,6 +8,20 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:categories,id',
+        ]);
+
+        foreach ($request->ids as $index => $id) {
+            Category::where('id', $id)->update(['order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function index()
     {
         $categories = Category::with('subcategories')->orderBy('order')->get();
@@ -29,7 +43,7 @@ class CategoryController extends Controller
 
         Category::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => Str::utf8Slug($request->name),
             'description' => $request->description,
             'order' => $request->order ?? 0,
         ]);
@@ -52,7 +66,7 @@ class CategoryController extends Controller
 
         $category->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => Str::utf8Slug($request->name),
             'description' => $request->description,
             'order' => $request->order ?? 0,
         ]);

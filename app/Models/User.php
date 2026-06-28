@@ -28,6 +28,7 @@ class User extends Authenticatable
         'avatar',
         'is_admin',
         'is_approved',
+        'role',
         'google_id',
         'facebook_id',
         'linkedin_id',
@@ -54,5 +55,51 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            if ($user->role === 'admin' || (bool)$user->is_admin) {
+                $user->role = 'admin';
+                $user->is_admin = true;
+                $user->is_approved = true; // Admins are always approved
+            } else {
+                $user->is_admin = false;
+                if (empty($user->role)) {
+                    $user->role = 'visitor';
+                }
+            }
+        });
+    }
+
+    public function isAuthor(): bool
+    {
+        return $this->role === 'author';
+    }
+
+    public function isEditor(): bool
+    {
+        return $this->role === 'editor';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || (bool)$this->is_admin;
+    }
+
+    public function isSeoManager(): bool
+    {
+        return $this->role === 'seo_manager';
+    }
+
+    public function authorProfile()
+    {
+        return $this->hasOne(Subcategory::class, 'user_id');
+    }
+
+    public function loginActivities()
+    {
+        return $this->hasMany(LoginActivity::class)->orderBy('logged_at', 'desc');
     }
 }

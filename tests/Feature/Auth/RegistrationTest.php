@@ -18,11 +18,17 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        $correctCaptcha = 'test-captcha';
+        session(['captcha_answer' => $correctCaptcha]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'mobile' => '1234567890',
+            'gender' => 'male',
+            'password' => 'SecurPass12!',
+            'password_confirmation' => 'SecurPass12!',
+            'captcha_answer' => $correctCaptcha,
         ]);
 
         $this->assertAuthenticated();

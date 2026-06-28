@@ -41,9 +41,9 @@
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="categories-table-body">
                                 @forelse($categories as $category)
-                                    <tr>
+                                    <tr data-id="{{ $category->id }}" class="cursor-move">
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             <p class="text-gray-900 whitespace-no-wrap font-semibold">{{ $category->name }}</p>
                                         </td>
@@ -53,8 +53,8 @@
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             <p class="text-gray-900 whitespace-no-wrap">{{ $category->subcategories->count() }}</p>
                                         </td>
-                                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                            <p class="text-gray-900 whitespace-no-wrap">{{ $category->order }}</p>
+                                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-semibold text-burnt-orange">
+                                            <p class="text-gray-900 whitespace-no-wrap order-display">{{ $category->order }}</p>
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             <div class="flex gap-2">
@@ -81,4 +81,50 @@
             </div>
         </div>
     </div>
+
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('categories-table-body');
+            if (el) {
+                var sortable = Sortable.create(el, {
+                    animation: 150,
+                    onEnd: function (evt) {
+                        var ids = Array.from(el.querySelectorAll('tr[data-id]')).map(function (row) {
+                            return row.getAttribute('data-id');
+                        });
+
+                        fetch('{{ route("admin.categories.reorder") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ ids: ids })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update visually shown order numbers in table
+                                el.querySelectorAll('tr[data-id]').forEach(function (row, index) {
+                                    var orderDisplay = row.querySelector('.order-display');
+                                    if (orderDisplay) {
+                                        orderDisplay.textContent = index;
+                                    }
+                                });
+                                console.log('Order updated');
+                            } else {
+                                alert('Failed to update order');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while reordering');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </x-app-layout>

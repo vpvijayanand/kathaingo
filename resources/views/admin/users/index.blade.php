@@ -27,10 +27,16 @@
                                         Email
                                     </th>
                                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Role
+                                    </th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Status
                                     </th>
                                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Registered At
+                                    </th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                        Linked Author
                                     </th>
                                     <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                         Actions
@@ -62,6 +68,18 @@
                                             <p class="text-gray-900 whitespace-no-wrap">{{ $user->email }}</p>
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                            <form action="{{ route('admin.users.updateRole', $user->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <select name="role" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-burnt-orange focus:border-burnt-orange block p-1.5">
+                                                    <option value="visitor" {{ $user->role === 'visitor' ? 'selected' : '' }}>Visitor</option>
+                                                    <option value="author" {{ $user->role === 'author' ? 'selected' : '' }}>Author</option>
+                                                    <option value="editor" {{ $user->role === 'editor' ? 'selected' : '' }}>Editor</option>
+                                                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                                                    <option value="seo_manager" {{ $user->role === 'seo_manager' ? 'selected' : '' }}>SEO Manager</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             @if($user->is_approved)
                                                 <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
                                                     <span aria-hidden="true" class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
@@ -76,6 +94,19 @@
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             <p class="text-gray-900 whitespace-no-wrap">{{ $user->created_at->format('M d, Y') }}</p>
+                                        </td>
+                                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                            <form action="{{ route('admin.users.linkAuthor', $user->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <select name="author_subcategory_id" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg focus:ring-burnt-orange focus:border-burnt-orange block p-1.5">
+                                                    <option value="">Unlinked</option>
+                                                    @foreach($authors as $author)
+                                                        <option value="{{ $author->id }}" {{ $user->authorProfile && $user->authorProfile->id === $author->id ? 'selected' : '' }}>
+                                                            {{ $author->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
                                         </td>
                                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                             <div class="flex gap-2">

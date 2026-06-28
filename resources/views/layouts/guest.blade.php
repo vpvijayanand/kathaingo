@@ -16,9 +16,9 @@
     </head>
     <body class="font-sans text-white antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-slate-gray">
-            <div>
+            <div class="mb-4">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-white" />
+                    <img src="{{ asset('images/logo/logo-header.png') }}" id="guest-logo" alt="கதைங்கோ" class="h-20 w-auto hover:scale-105 transition-transform duration-300 ease-in-out">
                 </a>
             </div>
 

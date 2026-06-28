@@ -1,264 +1,640 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name', 'கதைங்கோ') }} - Inspiring Stories & Ideas</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900&display=swap" rel="stylesheet" />
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+<x-public-layout>
+    <x-slot name="title">
+        {{ config('app.name', 'கதைங்கோ') }} - Inspiring Stories & Ideas
+    </x-slot>
+
+    <x-slot name="styles">
         <style>
-            * { font-family: 'Inter', sans-serif; }
-            .hero-gradient { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
-            .text-gradient { background: linear-gradient(135deg, #f39c12 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-            .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-            .card-hover:hover { transform: translateY(-12px); box-shadow: 0 25px 50px -12px rgba(243, 156, 18, 0.25); }
-            .fade-in { animation: fadeIn 0.6s ease-in; }
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-            .backdrop-blur { backdrop-filter: blur(10px); }
-            .category-badge { position: relative; overflow: hidden; }
-            .category-badge::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
-            .category-badge:hover::before { left: 100%; }
+            .featured-post-title {
+                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+                -webkit-text-stroke: 1px rgba(0, 0, 0, 0.85);
+                color: #ffffff;
+            }
+
+            .featured-post-desc {
+                font-size: 1.25rem;
+                font-weight: 800;
+                color: #f39c12 !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            }
+
+            .line-clamp-3 {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .backdrop-blur {
+                backdrop-filter: blur(10px);
+            }
+
+            .category-badge {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .category-badge::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .category-badge:hover::before {
+                left: 100%;
+            }
+
+            /* Magical Treasure Lamp Container styling (no card borders/backgrounds) */
+            .treasure-lamp-container {
+                position: relative;
+                display: inline-block;
+                transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                cursor: pointer;
+            }
+
+            .treasure-lamp-container:hover {
+                transform: translateY(-3px);
+            }
+
+            /* Ambient Glow overlay under the lamp */
+            .lamp-shadow-glow {
+                position: absolute;
+                bottom: 8px;
+                left: 50%;
+                transform: translateX(-50%) scale(1);
+                width: 150px;
+                height: 15px;
+                background: radial-gradient(ellipse at center, rgba(242, 140, 40, 0.45) 0%, transparent 75%);
+                filter: blur(6px);
+                opacity: 0.5;
+                animation: glow-pulse 4s ease-in-out infinite;
+                z-index: 1;
+                pointer-events: none;
+            }
+
+            @keyframes glow-pulse {
+                0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+                50% { opacity: 0.65; transform: translateX(-50%) scale(1.15); }
+            }
+
+            /* Lamp Image styling */
+            .lamp-image {
+                filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.65));
+                z-index: 2;
+                position: relative;
+                transition: filter 0.4s ease;
+            }
+
+            /* Hover states */
+            .treasure-lamp-container:hover .lamp-image {
+                filter: drop-shadow(0 12px 20px rgba(242, 140, 40, 0.2)) drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+            }
+
+            .treasure-lamp-container:hover .lamp-shadow-glow {
+                opacity: 0.85;
+                transform: translateX(-50%) scale(1.35);
+                background: radial-gradient(ellipse at center, rgba(242, 140, 40, 0.75) 0%, transparent 70%);
+                animation: none; /* Pause pulsing on hover for constant warm glow */
+            }
+
+            /* Smoke strands layout and animations */
+            .lamp-smoke-overlay {
+                position: absolute;
+                top: 48.9%;
+                left: 83.3%;
+                width: 120px;
+                height: 180px;
+                transform: translate(-90px, -100%); /* Position so smoke flows correctly */
+                pointer-events: none;
+                z-index: 10;
+                overflow: visible;
+            }
+
+            .smoke-svg {
+                width: 100%;
+                height: 100%;
+                overflow: visible;
+            }
+
+            .smoke-strand {
+                stroke-dasharray: 150;
+                stroke-dashoffset: 150;
+                filter: blur(3px);
+                transform-origin: bottom center;
+                transition: stroke-width 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+            }
+
+            .strand-1 {
+                animation: smoke-flow-1 4.5s ease-in-out infinite;
+            }
+
+            .strand-2 {
+                animation: smoke-flow-2 5.5s ease-in-out infinite;
+                animation-delay: 1.2s;
+            }
+
+            .strand-3 {
+                animation: smoke-flow-3 6.5s ease-in-out infinite;
+                animation-delay: 2.5s;
+            }
+
+            @keyframes smoke-flow-1 {
+                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.8) translate(0, 0); }
+                15% { opacity: 0.85; }
+                80% { opacity: 0.25; }
+                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.3) translate(-20px, -35px); }
+            }
+
+            @keyframes smoke-flow-2 {
+                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.7) translate(0, 0); }
+                20% { opacity: 0.8; }
+                75% { opacity: 0.2; }
+                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.4) translate(-10px, -45px); }
+            }
+
+            @keyframes smoke-flow-3 {
+                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.9) translate(0, 0); }
+                10% { opacity: 0.9; }
+                85% { opacity: 0.3; }
+                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.2) translate(-30px, -25px); }
+            }
+
+            .treasure-lamp-container:hover .smoke-strand {
+                stroke-width: 4;
+                filter: blur(2px);
+                opacity: 0.95;
+            }
+
+            /* Active Transition Classes */
+            .treasure-lamp-container.magical-activating {
+                pointer-events: none;
+            }
+
+            .treasure-lamp-container.magical-activating .lamp-image {
+                filter: brightness(2) drop-shadow(0 0 45px rgba(242, 140, 40, 0.9));
+                transform: scale(1.05);
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            }
+
+            .treasure-lamp-container.magical-activating .lamp-shadow-glow {
+                opacity: 1;
+                transform: translateX(-50%) scale(2.2);
+                background: radial-gradient(ellipse at center, rgba(242, 140, 40, 0.95) 0%, transparent 70%);
+                transition: all 0.4s ease;
+            }
+
+            .treasure-lamp-container.magical-activating .smoke-strand {
+                stroke-width: 6;
+                filter: blur(1.5px);
+                opacity: 0;
+                transform: scale(1.6) translate(-25px, -35px);
+                transition: all 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+            }
         </style>
-    </head>
-    <body class="antialiased bg-slate-gray text-white">
-        <!-- Navigation -->
-        <nav class="fixed w-full top-0 z-50 backdrop-blur bg-gray-900/90 border-b border-gray-800">
-            <div class="max-w-7xl mx-auto px-6 lg:px-8">
-                <div class="flex justify-between items-center h-20">
-                    <a href="/" class="text-3xl font-black tracking-tight">
-                        <span class="text-gradient">கதைங்கோ</span>
+    </x-slot>
+
+    <!-- SECTION 1 – HERO BANNER -->
+    <section x-data="{
+        images: {{ $heroImages->toJson() }},
+        currentIndex: 0,
+        init() {
+            if (this.images.length > 1) {
+                setInterval(() => {
+                    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+                }, 7000);
+            }
+        }
+    }" class="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden">
+
+        <!-- Background Slideshow -->
+        <div class="absolute inset-0 z-0 bg-gray-900">
+            <template x-for="(image, index) in images" :key="image.id">
+                <div x-show="currentIndex === index" x-transition:enter="transition ease-in-out duration-[3000ms]"
+                    x-transition:enter-start="opacity-0 scale-105 blur-sm"
+                    x-transition:enter-end="opacity-100 scale-100 blur-0"
+                    x-transition:leave="transition ease-in-out duration-[3000ms]"
+                    x-transition:leave-start="opacity-100 scale-100 blur-0"
+                    x-transition:leave-end="opacity-0 scale-110 blur-sm"
+                    class="absolute inset-0 bg-cover bg-center origin-center will-change-transform"
+                    :style="`background-image: url('${image.image_path}')`">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent"></div>
+                </div>
+            </template>
+            <!-- Fallback if no images -->
+            <div x-show="images.length === 0" class="absolute inset-0 hero-gradient"></div>
+            
+            <!-- Ambient Glow Overlay (Always active) -->
+            <div class="hero-glow-overlay"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 w-full">
+            <div class="max-w-4xl">
+                <h1 class="hero-title text-5xl lg:text-7xl font-black mb-8 leading-normal">
+                    {{ __('Stories &') }}
+                    <span class="text-gradient block mt-2 pb-2">{{ __('Learning') }}</span>
+                </h1>
+                <p class="hero-desc text-xl lg:text-2xl text-gray-200 mb-12 max-w-2xl leading-relaxed">
+                    {{ __('A sparrow that absorbs, digests, cooks stories, and sows them as seeds') }}
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-wrap gap-4 mt-8">
+                    <a href="{{ route('stories.index') }}"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-burnt-orange hover:bg-orange-600 rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl">
+                        {{ __('வாசிங்கோ') }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
                     </a>
-                    
-                    <div class="hidden lg:flex items-center space-x-8">
-                        <a href="/" class="text-sm font-semibold text-white hover:text-burnt-orange transition">Home</a>
-                        @foreach($categories as $category)
-                            <div class="relative group">
-                                <button class="text-sm font-semibold text-gray-300 hover:text-white transition flex items-center gap-1">
-                                    {{ $category->name }}
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </button>
-                                @if($category->subcategories->count() > 0)
-                                    <div class="absolute left-0 mt-3 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
-                                        <div class="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
-                                            @foreach($category->subcategories as $subcategory)
-                                                <a href="#" class="block px-5 py-3 text-sm text-gray-300 hover:bg-burnt-orange hover:text-white transition-all">
-                                                    {{ $subcategory->name }}
+                    <a href="{{ auth()->check() ? route('posts.create') : route('register') }}"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-gray-700/40 hover:bg-gray-950/80 border border-gray-700 rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl text-white">
+                        {{ __('எழுதுங்கோ') }}
+                        <svg class="w-5 h-5 text-burnt-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2 – WHAT IS கதைங்கோ? -->
+    <section id="about-kathaingo" class="py-24 px-6 lg:px-8 bg-gray-950 border-b border-gray-900" style="scroll-margin-top: 180px;">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="section-title text-4xl lg:text-5xl font-black mb-3 text-white">
+                    <span class="text-gradient">{{ __('கதைங்கோ?') }}</span>
+                </h2>
+                <div class="w-24 h-1 bg-burnt-orange mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="bg-gray-900/50 border border-gray-800/80 rounded-2xl p-8 lg:p-12 shadow-2xl backdrop-blur-sm">
+                <div class="text-gray-350 space-y-6 text-base lg:text-lg leading-loose text-justify tracking-wide">
+                    <p class="first-letter:text-5xl first-letter:font-black first-letter:text-burnt-orange first-letter:mr-3 first-letter:float-left">
+                        <strong>கதைங்கோ</strong> – கதைகளின் பெருவெளி. ஊர்க்குருவி ஒன்று காற்றில் மிதந்து வந்து கதைகளைச் சேகரிக்கிறது. அது கேட்ட கதைகள், கண்ட காட்சிகள், உணர்ந்த உணர்வுகள் யாவும் அதன் நெஞ்சில் தங்கிவிடுகின்றன.
+                    </p>
+                    <p>
+                        அந்தக் கதைகளை அது ஜீரணித்து, பக்குவமாகச் சமைத்து, பின் ஒரு விதையாக இந்த மண்ணில் தூவுகிறது. அந்த விதைகள் முளைத்து இன்று ஒரு பெரிய சோலையாக, "கதைங்கோ" என்ற இந்த இணையத் தளமாக உருவெடுத்துள்ளது.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3 – LATEST ARTICLES -->
+    <section class="py-24 px-6 lg:px-8 bg-slate-gray border-b border-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl lg:text-5xl font-black mb-3 text-white flex items-center justify-center gap-3">
+                    <svg class="w-8 h-8 lg:w-10 h-10 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Paper Sheet -->
+                        <path d="M4 3c0-1.1.9-2 2-2h8l6 6v14c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V3z" fill="#FFFFFF" stroke="#475569" stroke-width="2" stroke-linejoin="round"/>
+                        <!-- Folded corner for paper -->
+                        <path d="M14 1v6h6" stroke="#475569" stroke-width="2" stroke-linejoin="round" fill="#F1F5F9"/>
+                        <!-- Lines on paper -->
+                        <line x1="7" y1="11" x2="13" y2="11" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="7" y1="15" x2="15" y2="15" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="7" y1="19" x2="11" y2="19" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Blue Pen / Pencil overlapping -->
+                        <g transform="translate(1, -1)">
+                            <!-- Pen body -->
+                            <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L13 14.5l-4 1 1-4 8.5-8.5z" fill="#2563EB" stroke="#1D4ED8" stroke-width="1.5" stroke-linejoin="round"/>
+                            <!-- Tip detail -->
+                            <path d="M9 15.5l2-2" stroke="#1D4ED8" stroke-width="1.5"/>
+                            <path d="M17 4l3 3" stroke="#FFFFFF" stroke-width="1.2"/>
+                        </g>
+                    </svg>
+                    <span class="text-gradient">{{ __('Latest Articles') }}</span>
+                </h2>
+                <div class="w-32 h-1 bg-burnt-orange mx-auto rounded-full mb-4"></div>
+                <p class="stylish-desc text-sm lg:text-base max-w-2xl mx-auto mt-2 leading-relaxed">
+                    {{ __('Fresh perspectives and insights from our community') }}
+                </p>
+            </div>
+
+            @if($latestPosts->count() > 0)
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($latestPosts as $post)
+                        <article class="card-hover group bg-gray-900/40 border border-gray-800/60 rounded-xl p-4 flex flex-col justify-between h-full">
+                            <div>
+                                @php
+                                    $featuredImg = $post->image ?: ($post->featured_image ? asset('storage/' . $post->featured_image) : null);
+                                @endphp
+                                @if($featuredImg)
+                                    <div class="aspect-[16/9] rounded-lg overflow-hidden mb-4 bg-gray-800 relative">
+                                        <a href="{{ route('posts.show', $post->slug) }}">
+                                            <img src="{{ $featuredImg }}" alt="{{ $post->title }}"
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        </a>
+                                        <!-- Category Badge -->
+                                        @if($post->category)
+                                            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-burnt-orange/90 text-white text-[9px] font-bold uppercase tracking-wider rounded-md backdrop-blur-sm shadow-md">
+                                                {{ $post->category->name }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="aspect-[16/9] rounded-lg overflow-hidden mb-4 bg-gray-855 border border-gray-800/80 flex items-center justify-center text-gray-500 text-sm relative">
+                                        <span>No Image</span>
+                                        @if($post->category)
+                                            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-burnt-orange/90 text-white text-[9px] font-bold uppercase tracking-wider rounded-md backdrop-blur-sm shadow-md">
+                                                {{ $post->category->name }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="space-y-3">
+                                    <h3 class="text-lg font-bold leading-snug group-hover:text-burnt-orange transition line-clamp-2">
+                                        <a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a>
+                                    </h3>
+
+                                    <p class="text-gray-400 text-sm leading-relaxed line-clamp-3">
+                                        {{ Str::limit(strip_tags($post->content), 120) }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Footer & Engagement -->
+                            <div class="pt-3 mt-4 border-t border-gray-800/80 flex flex-col gap-3">
+                                <!-- Engagement Indicators -->
+                                <div class="flex items-center justify-between text-xs text-gray-400">
+                                    @php
+                                        $commentsCount = $post->comments_count ?? 0;
+                                    @endphp
+                                    <div class="flex items-center gap-2">
+                                        <span class="flex items-center gap-1 bg-gray-950/40 border border-gray-800/50 rounded-full px-2.5 py-0.5" title="{{ __('Comments') }}">
+                                            <span>💬</span>
+                                            <span class="font-bold text-gray-300 text-xs">{{ $commentsCount }}</span>
+                                        </span>
+                                    </div>
+                                    
+                                    @if($post->tags->isNotEmpty())
+                                        <div class="text-xs text-blue-400 font-bold tracking-wide flex gap-1.5 flex-wrap">
+                                            @foreach($post->tags->take(3) as $tag)
+                                                <a href="{{ url('/stories?tag=' . $tag->slug) }}" class="hover:text-blue-300 transition">
+                                                    #{{ $tag->name }}
                                                 </a>
                                             @endforeach
                                         </div>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                    
-                    <div class="flex items-center gap-4">
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="text-sm font-medium text-gray-300 hover:text-white transition">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" class="text-sm font-medium text-gray-300 hover:text-white transition">Sign in</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="px-6 py-2.5 bg-burnt-orange hover:bg-orange-600 rounded-full text-sm font-semibold transition transform hover:scale-105">
-                                    Get Started
-                                </a>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Hero Section -->
-        <section class="hero-gradient pt-32 pb-20 px-6 lg:px-8 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-20">
-                <div class="absolute top-0 left-1/4 w-96 h-96 bg-burnt-orange rounded-full filter blur-3xl"></div>
-                <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600 rounded-full filter blur-3xl"></div>
-            </div>
-            
-            <div class="max-w-7xl mx-auto relative z-10">
-                <div class="max-w-4xl">
-                    <h1 class="text-6xl lg:text-8xl font-black mb-8 leading-tight">
-                        Stories that
-                        <span class="text-gradient block">inspire change</span>
-                    </h1>
-                    <p class="text-xl lg:text-2xl text-gray-300 mb-12 max-w-2xl leading-relaxed">
-                        Discover insights across technology, lifestyle, business, and creativity. Join thousands of readers exploring what matters.
-                    </p>
-                    @if (Route::has('register') && !Auth::check())
-                        <a href="{{ route('register') }}" class="inline-flex items-center gap-3 px-8 py-4 bg-burnt-orange hover:bg-orange-600 rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl">
-                            Start Reading
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                            </svg>
-                        </a>
-                    @endif
-                </div>
-            </div>
-        </section>
-
-        <!-- Featured Post -->
-        @if($posts->first())
-            <section class="py-20 px-6 lg:px-8 bg-gray-900">
-                <div class="max-w-7xl mx-auto">
-                    <div class="grid lg:grid-cols-2 gap-12 items-center">
-                        <div class="order-2 lg:order-1">
-                            @if($posts->first()->category)
-                                <span class="category-badge inline-block px-4 py-1.5 bg-burnt-orange/20 text-burnt-orange text-xs font-bold uppercase tracking-wider rounded-full mb-6">
-                                    Featured • {{ $posts->first()->category->name }}
-                                </span>
-                            @endif
-                            <h2 class="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-                                {{ $posts->first()->title }}
-                            </h2>
-                            <p class="text-lg text-gray-400 mb-8 leading-relaxed">
-                                {{ Str::limit($posts->first()->content, 200) }}
-                            </p>
-                            <div class="flex items-center gap-6">
-                                <a href="#" class="inline-flex items-center gap-2 text-burnt-orange hover:text-orange-400 font-semibold transition">
-                                    Read Full Story
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                                    </svg>
-                                </a>
-                                <span class="text-gray-500 text-sm">{{ $posts->first()->published_at?->format('M d, Y') ?? 'Recently' }}</span>
-                            </div>
-                        </div>
-                        <div class="order-1 lg:order-2">
-                            @if($posts->first()->image)
-                                <div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-                                    <img src="{{ $posts->first()->image }}" alt="{{ $posts->first()->title }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-700">
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </section>
-        @endif
-
-        <!-- Latest Stories Grid -->
-        <section class="py-20 px-6 lg:px-8 bg-slate-gray">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex justify-between items-end mb-16">
-                    <div>
-                        <h2 class="text-5xl font-black mb-3">Latest Stories</h2>
-                        <p class="text-gray-400 text-lg">Fresh perspectives and insights</p>
-                    </div>
-                </div>
-
-                @if($posts->count() > 1)
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        @foreach($posts->skip(1) as $post)
-                            <article class="card-hover group">
-                                @if($post->image)
-                                    <div class="aspect-[16/10] rounded-xl overflow-hidden mb-6 bg-gray-800">
-                                        <img src="{{ $post->image }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                    </div>
-                                @endif
-                                
-                                <div class="space-y-4">
-                                    @if($post->category)
-                                        <span class="inline-block px-3 py-1 bg-gray-800 text-burnt-orange text-xs font-bold uppercase tracking-wider rounded-full">
-                                            {{ $post->category->name }}
+                                    @elseif($post->hashtags)
+                                        <span class="text-xs text-blue-400 font-bold tracking-wide">
+                                            {{ $post->hashtags }}
+                                        </span>
+                                    @else
+                                        <span class="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+                                            {{ $post->category?->name }}
                                         </span>
                                     @endif
-                                    
-                                    <h3 class="text-2xl font-bold leading-tight group-hover:text-burnt-orange transition">
-                                        <a href="#">{{ $post->title }}</a>
-                                    </h3>
-                                    
-                                    <p class="text-gray-400 line-clamp-3">
-                                        {{ Str::limit($post->content, 140) }}
-                                    </p>
-                                    
-                                    <div class="flex items-center justify-between pt-4 border-t border-gray-800">
-                                        <span class="text-sm text-gray-500">{{ $post->published_at?->format('M d, Y') ?? 'Recently' }}</span>
-                                        <a href="#" class="text-sm font-semibold text-burnt-orange hover:text-orange-400 transition flex items-center gap-1">
-                                            Read
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                            </svg>
-                                        </a>
-                                    </div>
                                 </div>
-                            </article>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </section>
 
-        <!-- Footer -->
-        <footer class="bg-gray-900 border-t border-gray-800 py-16 px-6 lg:px-8">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-                    <div class="lg:col-span-2">
-                        <h3 class="text-3xl font-black mb-4">
-                            <span class="text-gradient">கதைங்கோ</span>
-                        </h3>
-                        <p class="text-gray-400 max-w-sm">
-                            A creative space for sharing knowledge and ideas across diverse topics. Join our community of readers and contributors.
-                        </p>
-                    </div>
-                    @foreach($categories->take(3) as $category)
-                        <div>
-                            <h4 class="font-bold mb-4 text-white">{{ $category->name }}</h4>
-                            <ul class="space-y-2">
-                                @foreach($category->subcategories->take(4) as $subcategory)
-                                    <li>
-                                        <a href="#" class="text-gray-400 hover:text-burnt-orange text-sm transition">
-                                            {{ $subcategory->name }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                                <!-- Author & Date -->
+                                <div class="flex items-center justify-between pt-0.5">
+                                    <div class="flex items-center gap-2">
+                                        @if($post->authorSubcategory)
+                                            <a href="{{ route('authors.show', $post->authorSubcategory->slug) }}" class="flex items-center gap-2 text-xs text-gray-300 hover:text-burnt-orange font-bold transition">
+                                                @if($post->authorSubcategory->getAvatarUrl())
+                                                    <img src="{{ $post->authorSubcategory->getAvatarUrl() }}" alt="" class="w-5 h-5 rounded-full object-cover border border-burnt-orange/30">
+                                                @else
+                                                    <div class="w-5 h-5 rounded-full bg-burnt-orange/10 border border-burnt-orange/30 flex items-center justify-center text-[8px] font-black text-burnt-orange">
+                                                        {{ mb_substr($post->authorSubcategory->name, 0, 1, 'UTF-8') }}
+                                                    </div>
+                                                @endif
+                                                <span>{{ $post->authorSubcategory->name }}</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                    
+                                    <span class="text-gray-500 text-xs font-semibold">
+                                        {{ $post->published_at?->format('M d, Y') ?? __('Recently') }}
+                                    </span>
+                                </div>
+
+                                @auth
+                                    @if(auth()->id() === $post->author_id || auth()->user()->is_admin)
+                                        <div class="flex items-center justify-end gap-3 pt-2.5 mt-2 border-t border-gray-800/60">
+                                            <a href="{{ route('posts.edit', $post->id) }}" class="inline-flex items-center gap-1 text-[11px] font-bold text-burnt-orange hover:text-orange-400 transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                                <span>{{ __('Edit') }}</span>
+                                            </a>
+                                            <span class="text-gray-800">|</span>
+                                            <form action="{{ route('posts.destroy', $post->id) }}" method="POST" onsubmit="return confirm('Delete this post?');" class="inline m-0 p-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="inline-flex items-center gap-1 text-[11px] font-bold text-red-500 hover:text-red-400 transition bg-transparent border-0 p-0 cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    <span>{{ __('Delete') }}</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
+                                @endauth
+                            </div>
+                        </article>
                     @endforeach
                 </div>
                 
-                <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p class="text-gray-500 text-sm">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-                    
-                    <!-- Social Media Links -->
-                    <div class="flex items-center gap-4">
-                        <span class="text-gray-500 text-sm mr-2">Follow us:</span>
-                        <a href="https://www.youtube.com/@your-channel" target="_blank" rel="noopener" class="text-gray-400 hover:text-red-500 transition" title="YouTube">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                            </svg>
-                        </a>
-                        <a href="https://www.facebook.com/your-page" target="_blank" rel="noopener" class="text-gray-400 hover:text-blue-500 transition" title="Facebook">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </a>
-                        <a href="https://twitter.com/your-handle" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition" title="Twitter/X">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                        </a>
-                        <a href="https://www.linkedin.com/company/your-company" target="_blank" rel="noopener" class="text-gray-400 hover:text-blue-400 transition" title="LinkedIn">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                        </a>
-                        <a href="https://www.instagram.com/your-account" target="_blank" rel="noopener" class="text-gray-400 hover:text-pink-500 transition" title="Instagram">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-                    </div>
-                    
-                    <div class="flex gap-6">
-                        <a href="#" class="text-gray-400 hover:text-white transition">Privacy</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">Terms</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition">Contact</a>
-                    </div>
+                <div class="mt-16 text-center">
+                    <a href="{{ route('stories.index') }}"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-burnt-orange hover:bg-orange-600 rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl">
+                        {{ __('அனைத்துப் பதிவுகளையும் பார்க்க') }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
                 </div>
+            @else
+                <p class="text-center text-gray-500 py-12">{{ __('No stories found.') }}</p>
+            @endif
+        </div>
+    </section>
+
+    <!-- SECTION 4 – EXPLORE BY CATEGORY -->
+    <section class="py-24 px-6 lg:px-8 bg-gray-950 border-b border-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl lg:text-5xl font-black mb-3 text-white flex items-center justify-center gap-3">
+                    <span class="shrink-0 text-3xl lg:text-4xl">🏺</span>
+                    <span class="text-gradient">{{ __('Explore by Category') }}</span>
+                </h2>
+                <div class="w-32 h-1 bg-burnt-orange mx-auto rounded-full mb-4"></div>
+                <p class="stylish-desc text-sm lg:text-base max-w-2xl mx-auto mt-2 leading-relaxed">
+                    {{ __('Find stories by your favorite topics') }}
+                </p>
             </div>
-        </footer>
-    </body>
-</html>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach($exploreCategories as $exploreCat)
+                    <a href="{{ $exploreCat['url'] }}"
+                        class="group relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800/80 hover:border-burnt-orange/50 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-burnt-orange/10 flex flex-col justify-between min-h-[140px]">
+                        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-burnt-orange/5 rounded-full blur-xl group-hover:bg-burnt-orange/10 transition-all"></div>
+                        
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">
+                                {{ $exploreCat['type'] === 'subcategory' ? __('Category') : __('Topic') }}
+                            </span>
+                            <h3 class="text-lg lg:text-xl font-bold group-hover:text-burnt-orange transition-colors">
+                                {{ $exploreCat['name'] }}
+                            </h3>
+                            @if(isset($exploreCat['name_en']) && $exploreCat['name_en'] !== $exploreCat['name'])
+                                <span class="text-xs text-gray-500 block mt-1 font-medium">{{ $exploreCat['name_en'] }}</span>
+                            @endif
+                        </div>
+                        
+                        <div class="flex justify-between items-end mt-4">
+                            <span class="text-xs bg-burnt-orange/10 text-burnt-orange px-2.5 py-1 rounded-md font-bold">
+                                {{ $exploreCat['posts_count'] }} {{ $exploreCat['posts_count'] === 1 ? __('Story') : __('Stories') }}
+                            </span>
+                            <span class="text-burnt-orange opacity-0 group-hover:opacity-100 transition-opacity font-bold text-lg">→</span>
+                        </div>
+                    </a>
+                @endforeach
+
+
+            </div>
+
+            <!-- Centered Kathaingo's Magical Treasure Lamp -->
+            <div class="flex justify-center mt-14">
+                <a href="{{ route('about') }}#kathaingos-universe" id="treasure-lamp-link"
+                    class="treasure-lamp-container group block relative overflow-visible" onclick="triggerMagicalTransition(event, this)">
+                    
+                    <!-- Glowing shadow under the lamp -->
+                    <div class="lamp-shadow-glow"></div>
+                    
+                    <!-- Transparent Lamp Image -->
+                    <img src="{{ asset('images/treasure-lamp.png') }}" alt="Kathaingo's Magical Treasure Lamp" 
+                        class="lamp-image w-[360px] md:w-[420px] h-auto object-contain select-none pointer-events-none transition-all duration-500 ease-out" />
+                    
+                    <!-- Smoke Overlay -->
+                    <div class="lamp-smoke-overlay">
+                        <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="magic-smoke-grad" x1="50%" y1="100%" x2="50%" y2="0%">
+                                    <stop offset="0%" stop-color="#FFE699" stop-opacity="0.95" />
+                                    <stop offset="35%" stop-color="#FDBA74" stop-opacity="0.65" />
+                                    <stop offset="70%" stop-color="#C084FC" stop-opacity="0.3" />
+                                    <stop offset="100%" stop-color="#818CF8" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path class="smoke-strand strand-1" d="M90,140 C75,120 85,95 68,65 C52,40 62,20 45,0" stroke="url(#magic-smoke-grad)" stroke-width="2.5" stroke-linecap="round" />
+                            <path class="smoke-strand strand-2" d="M90,140 C85,115 72,90 80,60 C88,35 75,15 85,-10" stroke="url(#magic-smoke-grad)" stroke-width="2.2" stroke-linecap="round" />
+                            <path class="smoke-strand strand-3" d="M90,140 C80,125 95,100 82,70 C72,45 78,25 68,0" stroke="url(#magic-smoke-grad)" stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    
+
+                    <!-- Jewel Glows -->
+                    
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5 – FEATURED WRITERS -->
+    <section class="py-24 px-6 lg:px-8 bg-slate-gray border-b border-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-4xl lg:text-5xl font-black mb-3 text-white flex items-center justify-center gap-3">
+                    <span class="shrink-0 text-3xl lg:text-4xl">⭐</span>
+                    <span class="text-gradient">{{ __('Featured Writers') }}</span>
+                </h2>
+                <div class="w-32 h-1 bg-burnt-orange mx-auto rounded-full mb-4"></div>
+                <p class="stylish-desc text-sm lg:text-base max-w-2xl mx-auto mt-2 leading-relaxed">
+                    {{ __('Meet the voices shaping our stories') }}
+                </p>
+            </div>
+
+            @if($featuredWriters->count() > 0)
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
+                    @foreach($featuredWriters as $writer)
+                        <a href="{{ route('authors.show', $writer->slug) }}"
+                            class="group flex flex-col items-center text-center p-6 bg-gray-900/40 border border-gray-800/60 rounded-2xl transition duration-300 hover:border-burnt-orange/50 hover:bg-gray-900/80 hover:-translate-y-1">
+                            
+                            <div class="relative mb-4">
+                                @if($writer->getAvatarUrl())
+                                    <img src="{{ $writer->getAvatarUrl() }}" alt="{{ $writer->name }}"
+                                        class="w-24 h-24 rounded-full object-cover border-2 border-gray-800 group-hover:border-burnt-orange transition duration-300 shadow-lg">
+                                @else
+                                    <div class="w-24 h-24 rounded-full bg-burnt-orange/10 border-2 border-gray-850 flex items-center justify-center text-3xl font-black text-burnt-orange group-hover:border-burnt-orange transition duration-300 shadow-lg">
+                                        {{ mb_substr($writer->name, 0, 1, 'UTF-8') }}
+                                    </div>
+                                @endif
+                                <div class="absolute inset-0 rounded-full bg-burnt-orange/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                            
+                            <h3 class="text-base font-bold text-white group-hover:text-burnt-orange transition duration-300">
+                                {{ $writer->name }}
+                            </h3>
+                            <span class="text-xs text-gray-400 mt-1">
+                                {{ $writer->authored_posts_count ?? $writer->authoredPosts()->where('status', 'published')->count() }} {{ __('Stories') }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="mt-16 text-center">
+                    <a href="{{ route('about') }}#core-categories-featured-bloggers"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 hover:bg-gray-850 border border-gray-700 hover:border-burnt-orange text-burnt-orange rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl">
+                        {{ __('எழுத்தாளர்கள் பட்டியல்') }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </a>
+                </div>
+            @else
+                <p class="text-center text-gray-500 py-12">{{ __('No writers found.') }}</p>
+            @endif
+        </div>
+    </section>
+
+    <!-- SECTION 6 – JOIN THE COMMUNITY -->
+    <section class="py-24 px-6 lg:px-8 bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 border-b border-gray-900 relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h2 class="text-5xl lg:text-6xl font-black mb-6 leading-relaxed text-white">
+                <span class="text-gradient">{{ __('உங்கள் வரவு நல்வரவாகுக!!!') }}</span>
+            </h2>
+            <p class="font-extrabold text-xl lg:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed" style="background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)); letter-spacing: 0.025em;">
+                {{ __('உங்கள் கதைகளுக்காகவும் கருத்துக்களுக்காகவும் கதைங்கோ உங்களைத் தன் இருகரம் நீட்டி வரவேற்கிறது. துள்ளி வருக! எழுதித் தள்ளுக!') }}
+            </p>
+            <a href="{{ auth()->check() ? route('posts.create') : route('register') }}"
+                class="inline-flex items-center gap-3 px-8 py-4 bg-burnt-orange hover:bg-orange-600 rounded-full text-lg font-bold transition transform hover:scale-105 shadow-2xl">
+                {{ __('பதிவராக இணையுங்கள்') }}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <script>
+        function triggerMagicalTransition(event, element) {
+            event.preventDefault();
+            element.classList.add('magical-activating');
+            const targetUrl = element.getAttribute('href');
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 1000);
+        }
+
+        // Assign random glitter delays to each gemstone for a natural twinkle
+        document.addEventListener('DOMContentLoaded', () => {
+            const gems = document.querySelectorAll('.jewel-overlay');
+            gems.forEach(gem => {
+                const delay = (Math.random() * 2).toFixed(2) + 's';
+                gem.style.setProperty('--glitter-delay', delay);
+            });
+        });    </script>
+
+</x-public-layout>

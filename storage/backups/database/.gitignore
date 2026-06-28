@@ -1,0 +1,5 @@
+# Ignore all generated SQL backup files — these are stored locally only
+*.sql
+*.dump
+*.backup
+backup.log

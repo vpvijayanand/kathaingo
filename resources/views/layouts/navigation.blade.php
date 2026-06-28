@@ -28,6 +28,9 @@
                         <x-nav-link :href="route('admin.subcategories.index')" :active="request()->routeIs('admin.subcategories.*')">
                             {{ __('Subcategories') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.settings.edit')" :active="request()->routeIs('admin.settings.*')">
+                            {{ __('Settings') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -96,6 +99,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.subcategories.index')" :active="request()->routeIs('admin.subcategories.*')">
                     {{ __('Subcategories') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.settings.edit')" :active="request()->routeIs('admin.settings.*')">
+                    {{ __('Settings') }}
                 </x-responsive-nav-link>
             @endif
         </div>
