@@ -1269,6 +1269,7 @@
         function scanAllBlocksProgressively() {
             const body = editor.getBody();
             const text = body.textContent || '';
+            const detectedLang = /[\u0B80-\u0BFF]/.test(text) ? 'ta' : 'en';
             
             const consistencyUrl = (window.Kathaingo && window.Kathaingo.routes && window.Kathaingo.routes.analyzeConsistency) || '/api/writing-assistant/analyze-consistency';
             
@@ -1279,12 +1280,12 @@
                     'X-CSRF-TOKEN': getCsrfToken(),
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ text: text })
+                body: JSON.stringify({ text: text, language: detectedLang })
             })
             .then(res => {
                 if (!res.ok) {
                     console.error('Consistency API error: HTTP status ' + res.status);
-                    return res.json().then(t => { throw new Error(t); });
+                    return res.json().then(t => { throw new Error(typeof t === 'object' ? JSON.stringify(t) : t); });
                 }
                 return res.json();
             })
@@ -1301,7 +1302,18 @@
                 }
             })
             .catch(err => {
-                console.error('Error fetching consistency details:', err);
+                try {
+                    const parsed = JSON.parse(err.message);
+                    if (parsed && parsed.errors) {
+                        console.error('Consistency API validation errors:', parsed.errors);
+                    } else if (parsed && parsed.message) {
+                        console.error('Consistency API error message:', parsed.message);
+                    } else {
+                        console.error('Error fetching consistency details:', err);
+                    }
+                } catch (e) {
+                    console.error('Error fetching consistency details:', err);
+                }
                 activeInconsistencies = {};
                 activeOverusedWords = {};
             })

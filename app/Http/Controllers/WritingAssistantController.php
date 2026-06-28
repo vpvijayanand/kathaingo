@@ -17,11 +17,18 @@ class WritingAssistantController extends Controller
     public function checkBlock(Request $request)
     {
         $request->validate([
-            'text' => 'required|string',
+            'text' => 'nullable|string',
             'language' => 'nullable|string|in:ta,en,auto'
         ]);
 
-        $text = $request->input('text');
+        $text = $request->input('text', '');
+        
+        if (empty(trim($text))) {
+            return response()->json([
+                'language' => $request->input('language', 'auto'),
+                'matches' => []
+            ]);
+        }
         
         // Normalize non-breaking spaces (\x{00A0}) and other space variants to standard ASCII spaces
         $text = preg_replace('/[\x{00A0}\x{2007}\x{202F}\x{20AF}]/u', ' ', $text);
@@ -238,11 +245,19 @@ class WritingAssistantController extends Controller
     public function analyzeConsistency(Request $request)
     {
         $request->validate([
-            'text' => 'required|string',
+            'text' => 'nullable|string',
             'language' => 'nullable|string|in:ta,en,auto'
         ]);
 
-        $text = $request->input('text');
+        $text = $request->input('text', '');
+        
+        if (empty(trim($text))) {
+            return response()->json([
+                'inconsistencies' => (object)[],
+                'overused' => (object)[]
+            ]);
+        }
+
         $lang = $request->input('language', 'auto');
 
         if ($lang === 'auto') {
@@ -407,11 +422,29 @@ class WritingAssistantController extends Controller
     public function reviewArticle(Request $request)
     {
         $request->validate([
-            'text' => 'required|string',
+            'text' => 'nullable|string',
             'language' => 'nullable|string|in:ta,en,auto'
         ]);
 
-        $text = $request->input('text');
+        $text = $request->input('text', '');
+        if (empty(trim($text))) {
+            return response()->json([
+                'summary' => [
+                    'spelling' => 0,
+                    'grammar' => 0,
+                    'style' => 0,
+                    'consistency' => 0,
+                    'unknown' => 0,
+                    'readability' => 'Easy (எளிமை)',
+                    'punctuation' => 0,
+                    'repeated_words' => 0,
+                    'long_sentences' => 0,
+                    'safety' => 0,
+                    'plagiarism' => 0
+                ]
+            ]);
+        }
+        
         $lang = $request->input('language', 'auto');
         if ($lang === 'auto') {
             $lang = $this->detectLanguage($text);

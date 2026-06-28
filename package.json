@@ -3,8 +3,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "c:/Users/ilang/scoop/apps/nodejs-lts/current/node.exe ./node_modules/vite/bin/vite.js build",
-        "dev": "c:/Users/ilang/scoop/apps/nodejs-lts/current/node.exe ./node_modules/vite/bin/vite.js"
+        "build": "vite build",
+        "dev": "vite"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

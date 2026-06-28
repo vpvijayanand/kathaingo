@@ -1444,5 +1444,226 @@
             }, 'image/jpeg', 0.9);
         }
     </script>
+    <!-- 1. PREVIEW ARTICLE MODAL -->
+    <div x-show="showPreviewModal" x-transition.opacity class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4 overflow-y-auto" x-cloak>
+        <div x-show="showPreviewModal" x-transition.scale class="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] overflow-hidden transform transition-all duration-300">
+            <!-- Header -->
+            <div class="px-6 py-4 bg-gray-950 border-b border-gray-850 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 text-xs font-semibold bg-burnt-orange/20 border border-burnt-orange/30 text-burnt-orange rounded-full">Preview View</span>
+                    <h3 class="text-lg font-bold text-white">பதிவின் முன்பார்வை (Article Preview)</h3>
+                </div>
+                <button type="button" @click="showPreviewModal = false" class="text-gray-400 hover:text-white transition cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 md:p-8 overflow-y-auto bg-slate-gray min-h-[50vh] text-gray-300 leading-relaxed">
+                <div class="max-w-3xl mx-auto">
+                    <!-- Category Breadcrumbs -->
+                    <div class="flex items-center gap-2 text-xs text-burnt-orange font-semibold mb-4 bg-gray-950/40 border border-gray-850/50 rounded-full px-4 py-1.5 w-fit">
+                        <span>Home</span>
+                        <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <span x-text="previewData.category || 'Uncategorized (வகைப்படுத்தப்படவில்லை)'"></span>
+                    </div>
 
+                    <!-- Title -->
+                    <h1 class="text-2xl md:text-4xl font-black text-white mb-6 leading-tight" x-text="previewData.title || 'Untitled Post (தலைப்பற்ற பதிவு)'"></h1>
+
+                    <!-- Author & Info -->
+                    <div class="flex items-center gap-3 text-gray-400 text-sm mb-8 border-b border-gray-800 pb-4">
+                        <div class="w-9 h-9 rounded-full bg-burnt-orange/20 border border-burnt-orange flex items-center justify-center font-bold text-burnt-orange" x-text="(previewData.author || 'A').substring(0,1)"></div>
+                        <div>
+                            <span class="font-semibold text-gray-200" x-text="previewData.author"></span>
+                            <span class="mx-2 text-gray-600">•</span>
+                            <span x-text="previewData.readTime + ' min read (நிமிட வாசிப்பு)'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <template x-if="previewData.imageSrc">
+                        <div class="w-full rounded-2xl overflow-hidden shadow-2xl mb-8 bg-gray-800 border border-gray-800">
+                            <img :src="previewData.imageSrc" alt="Featured Image" class="w-full max-h-[450px] object-cover">
+                        </div>
+                    </template>
+
+                    <!-- Excerpt -->
+                    <template x-if="previewData.excerpt">
+                        <p class="text-lg font-bold text-burnt-orange leading-relaxed mb-6 border-l-4 border-burnt-orange pl-4" x-text="previewData.excerpt"></p>
+                    </template>
+
+                    <!-- Content body -->
+                    <div class="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed bg-gray-900/30 border border-gray-800/40 rounded-3xl p-6 md:p-8 shadow-xl" x-html="previewData.content || '<p class=\'text-gray-500 italic\'>பதிவின் உள்ளடக்கம் காலியாக உள்ளது (No content written yet).</p>'"></div>
+
+                    <!-- Tags -->
+                    <template x-if="previewData.tags && previewData.tags.length > 0">
+                        <div class="flex items-center gap-2 mt-8 flex-wrap border-t border-gray-800 pt-4">
+                            <span class="text-xs text-gray-500 uppercase font-bold">Tags:</span>
+                            <template x-for="tag in previewData.tags" :key="tag">
+                                <span class="bg-burnt-orange hover:bg-orange-600 text-white text-xs font-semibold px-2.5 py-1 rounded transition" x-text="tag"></span>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-950 border-t border-gray-850 flex items-center justify-end">
+                <button type="button" @click="showPreviewModal = false" class="px-5 py-2 bg-gray-850 hover:bg-gray-800 text-white font-semibold rounded-xl text-xs transition border border-gray-850 cursor-pointer">
+                    Back to Edit (மீண்டும் எழுதவும்)
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 2. REVIEW ARTICLE REPORT MODAL -->
+    <div x-show="showReviewModal" x-transition.opacity class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4 overflow-y-auto" x-cloak>
+        <div x-show="showReviewModal" x-transition.scale class="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full flex flex-col max-h-[90vh] overflow-hidden transform transition-all duration-300">
+            <!-- Header -->
+            <div class="px-6 py-4 bg-gray-950 border-b border-gray-850 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 text-xs font-semibold bg-burnt-orange/20 border border-burnt-orange/30 text-burnt-orange rounded-full">Quality Scanner</span>
+                    <h3 class="text-lg font-bold text-white">பதிவின் மதிப்பாய்வு அறிக்கை (Article Review Report)</h3>
+                </div>
+                <button type="button" @click="showReviewModal = false" class="text-gray-400 hover:text-white transition cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto bg-gray-950/40 text-gray-300">
+                <template x-if="reviewReport">
+                    <div>
+                        <!-- Overall Readiness Indicator Banner -->
+                        <div class="p-4 rounded-xl border mb-6 flex items-center justify-between shadow-md"
+                            :class="{
+                                'bg-emerald-950/20 border-emerald-500/30 text-emerald-400': reviewReport.readiness === 'Reviewed',
+                                'bg-amber-950/20 border-amber-500/30 text-amber-400': reviewReport.readiness === 'Needs Attention',
+                                'bg-rose-950/20 border-rose-500/30 text-rose-400': reviewReport.readiness === 'Major Issues'
+                            }">
+                            <div class="flex items-center gap-3">
+                                <!-- Status Icons -->
+                                <template x-if="reviewReport.readiness === 'Reviewed'">
+                                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </template>
+                                <template x-if="reviewReport.readiness === 'Needs Attention'">
+                                    <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                </template>
+                                <template x-if="reviewReport.readiness === 'Major Issues'">
+                                    <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </template>
+                                
+                                <div>
+                                    <h4 class="font-bold text-sm" x-text="
+                                        reviewReport.readiness === 'Reviewed' ? 'மிகவும் நன்று! பதிவு தயாராக உள்ளது. (Looks Good!)' : 
+                                        (reviewReport.readiness === 'Needs Attention' ? 'கவனம் தேவை: சில பரிந்துரைகள் உள்ளன. (Needs Attention)' : 'முக்கிய திருத்தங்கள் தேவை! (Major Issues Detected)')
+                                    "></h4>
+                                    <p class="text-xs mt-0.5 opacity-85" x-text="
+                                        reviewReport.readiness === 'Reviewed' ? 'முக்கிய பிழைகள் எதுவும் இல்லை. தாராளமாக சமர்ப்பிக்கலாம்!' : 
+                                        (reviewReport.readiness === 'Needs Attention' ? 'பதிவை மேலும் மேம்படுத்த சில திருத்தங்கள் பரிந்துரைக்கப்படுகின்றன.' : 'பதிவைச் சமர்ப்பிக்கும் முன் சிவப்பு நிற எச்சரிக்கைகளை சரிசெய்யவும்.')
+                                    "></p>
+                                </div>
+                            </div>
+                            <!-- Counter badges -->
+                            <div class="flex gap-2">
+                                <span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold" x-show="reviewReport.redCount > 0" x-text="reviewReport.redCount + ' பிழைகள் (Errors)'"></span>
+                                <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/20 text-xs font-bold" x-show="reviewReport.yellowCount > 0" x-text="reviewReport.yellowCount + ' பரிந்துரைகள் (Warnings)'"></span>
+                            </div>
+                        </div>
+
+                        <!-- Readability Index Block -->
+                        <div class="mb-6 p-4 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-between text-sm">
+                            <span class="text-gray-400">வாசிப்புத் தன்மை (Readability Index):</span>
+                            <span class="font-semibold text-burnt-orange" x-text="reviewReport.readability"></span>
+                        </div>
+
+                        <!-- Checklist list -->
+                        <h4 class="font-bold text-sm text-gray-400 mb-3 border-b border-gray-800 pb-2">மதிப்பீட்டுப் புள்ளிகள் (Evaluation Items)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <template x-for="item in reviewReport.checklist" :key="item.id">
+                                <div class="p-3 bg-gray-900 border border-gray-800 rounded-xl flex items-start gap-3">
+                                    <!-- Indicator circle -->
+                                    <div class="mt-0.5">
+                                        <template x-if="item.status === 'green'">
+                                            <span class="text-emerald-500 flex items-center justify-center bg-emerald-500/10 border border-emerald-500/25 rounded-full p-0.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            </span>
+                                        </template>
+                                        <template x-if="item.status === 'yellow'">
+                                            <span class="text-amber-500 flex items-center justify-center bg-emerald-500/10 border border-amber-500/25 rounded-full p-0.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01"/></svg>
+                                            </span>
+                                        </template>
+                                        <template x-if="item.status === 'red'">
+                                            <span class="text-rose-500 flex items-center justify-center bg-rose-500/10 border border-rose-500/25 rounded-full p-0.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </span>
+                                        </template>
+                                    </div>
+                                    
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white" x-text="item.label"></h5>
+                                        <p class="text-xs text-gray-400 mt-1" x-text="item.message"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-950 border-t border-gray-850 flex items-center justify-between">
+                <p class="text-xs text-gray-500">Kathaingo Content Review System v2.0</p>
+                <button type="button" @click="showReviewModal = false" class="px-5 py-2 bg-burnt-orange hover:bg-orange-700 text-white font-semibold rounded-xl text-xs transition cursor-pointer select-none">
+                    Close (அறிக்கையை மூடு)
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 3. SOFT WARNING BEFORE SUBMIT MODAL -->
+    <div x-show="showWarningModal" x-transition.opacity class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4" x-cloak>
+        <div x-show="showWarningModal" x-transition.scale class="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl max-w-md w-full flex flex-col overflow-hidden transform transition-all duration-300">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-gray-950 border-b border-gray-850 flex items-center gap-2 text-rose-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <h3 class="text-base font-bold text-white">சமர்ப்பிப்பு உறுதிப்படுத்தல் (Submission Alert)</h3>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 text-sm text-gray-300 leading-relaxed bg-gray-950/20">
+                <!-- Case A: Unreviewed -->
+                <template x-if="warningModalType === 'unreviewed'">
+                    <div>
+                        <p class="font-semibold text-amber-400">இந்த பதிவை இன்னும் Review செய்யவில்லை.</p>
+                        <p class="mt-2 text-gray-400">பதிவை சமர்ப்பிப்பதற்கு முன் ஏதேனும் எழுத்துப் பிழைகள் அல்லது வடிவமைப்பு விடுபடல்கள் உள்ளதா என்று தரம் சரிபார்க்க விரும்புகிறீர்களா?</p>
+                    </div>
+                </template>
+
+                <!-- Case B: Major Issues -->
+                <template x-if="warningModalType === 'major_issues'">
+                    <div>
+                        <p class="font-semibold text-rose-400">இந்த பதிவில் சில முக்கியமான திருத்தங்கள் தேவைப்படலாம்.</p>
+                        <p class="mt-2 text-gray-400 font-medium">மதிப்பாய்வு முடிவுகளின்படி சில கட்டாய விவரங்கள் அல்லது இலக்கண/எழுத்துப் பிழைகள் சிவப்பு நிறத்தில் குறிக்கப்பட்டுள்ளன. முதலில் திருத்தங்களைச் சரிபார்க்க விரும்புகிறீர்களா?</p>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3.5 bg-gray-950 border-t border-gray-850 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
+                <button type="button" @click="reviewNow()"
+                    class="px-4 py-2 bg-burnt-orange hover:bg-orange-700 text-white font-semibold rounded-lg text-xs transition cursor-pointer text-center select-none">
+                    Review Now (மதிீடு செய்)
+                </button>
+                <button type="button" @click="submitAnyway()"
+                    class="px-4 py-2 border border-gray-800 hover:border-gray-700 bg-transparent text-gray-400 hover:text-white font-semibold rounded-lg text-xs transition cursor-pointer text-center select-none">
+                    Submit Anyway (அப்படியே சமர்ப்பி)
+                </button>
+            </div>
+        </div>
+    </div>
 </x-app-layout>
