@@ -875,7 +875,7 @@
                         <div class="mb-4">
                             <x-input-label for="published_at" :value="__('Publication Date (Optional / Default to Now)')" />
                             <x-text-input id="published_at" class="block mt-1 w-full" type="datetime-local" name="published_at"
-                                :value="old('published_at')" />
+                                value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}" />
                             <p class="mt-1 text-sm text-gray-400">Specify the publication date. Useful for backdating old Facebook posts or scheduling.</p>
                             <x-input-error :messages="$errors->get('published_at')" class="mt-2" />
                         </div>
