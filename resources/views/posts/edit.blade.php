@@ -853,15 +853,11 @@
                                     },
 
                                     handleFormSubmit(event) {
-                                        if (!this.isReviewed) {
-                                             this.warningModalType = 'unreviewed';
-                                             this.showWarningModal = true;
-                                             return false;
-                                        }
                                         // Sync TinyMCE content to textarea before native submit
                                         if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
                                             tinymce.get('content').save();
                                         }
+                                        this.showSubmitLoader = true;
                                         event.target.submit();
                                     },
 
@@ -873,6 +869,7 @@
                                         if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
                                             tinymce.get('content').save();
                                         }
+                                        this.showSubmitLoader = true;
                                         document.getElementById('post-form').submit();
                                     },
 
@@ -1685,3 +1682,33 @@
         </div>
     </div>
 </x-app-layout>
+
+{{-- Article Upload Loading Overlay --}}
+<div id="submit-loader" style="display:none;" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-gray-950/95 backdrop-blur-md">
+    <div class="flex flex-col items-center gap-6 select-none">
+        <div class="relative flex items-center justify-center">
+            <span class="absolute inline-flex h-28 w-28 rounded-full bg-burnt-orange/20 animate-ping"></span>
+            <span class="absolute inline-flex h-20 w-20 rounded-full bg-burnt-orange/10 animate-ping" style="animation-delay:0.3s"></span>
+            <svg class="h-16 w-16 animate-spin text-burnt-orange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+        <div class="text-center">
+            <p class="text-white text-xl font-bold tracking-wide">கட்டுரை பதிவேற்றப்படுகிறது...</p>
+            <p class="text-burnt-orange text-sm font-semibold mt-1">Article is uploading, please wait</p>
+            <p class="text-gray-500 text-xs mt-3">சாளரத்தை மூடாதீர்கள் &middot; Do not close this window</p>
+        </div>
+        <div class="flex gap-2 mt-2">
+            <span class="h-2 w-2 rounded-full bg-burnt-orange animate-bounce" style="animation-delay:0s"></span>
+            <span class="h-2 w-2 rounded-full bg-burnt-orange animate-bounce" style="animation-delay:0.15s"></span>
+            <span class="h-2 w-2 rounded-full bg-burnt-orange animate-bounce" style="animation-delay:0.3s"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('post-form').addEventListener('submit', function() {
+        document.getElementById('submit-loader').style.display = 'flex';
+    });
+</script>
