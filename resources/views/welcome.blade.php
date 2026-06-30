@@ -164,6 +164,30 @@
                 100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.2) translate(-30px, -25px); }
             }
 
+            .strand-4 {
+                animation: smoke-flow-4 5s ease-in-out infinite;
+                animation-delay: 0.5s;
+            }
+
+            .strand-5 {
+                animation: smoke-flow-5 6s ease-in-out infinite;
+                animation-delay: 2s;
+            }
+
+            @keyframes smoke-flow-4 {
+                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.85) translate(0, 0); }
+                15% { opacity: 0.85; }
+                80% { opacity: 0.25; }
+                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.35) translate(15px, -40px); }
+            }
+
+            @keyframes smoke-flow-5 {
+                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.75) translate(0, 0); }
+                20% { opacity: 0.8; }
+                75% { opacity: 0.2; }
+                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.25) translate(25px, -30px); }
+            }
+
             .treasure-lamp-container:hover .smoke-strand {
                 stroke-width: 4;
                 filter: blur(2px);
@@ -554,8 +578,8 @@
                         class="lamp-image w-[360px] md:w-[420px] h-auto object-contain select-none pointer-events-none transition-all duration-500 ease-out" />
                     
                     <!-- Smoke Overlay -->
-                    <div class="lamp-smoke-overlay" style="transform: translate(-100px, -110px) scale(1.8);">
-                        <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div class="lamp-smoke-overlay" style="top: auto; bottom: 40%; left: 80%; transform: translateX(-50%) scale(2.2); transform-origin: bottom center;">
+                        <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
                             <defs>
                                 <linearGradient id="magic-smoke-grad" x1="50%" y1="100%" x2="50%" y2="0%">
                                     <stop offset="0%" stop-color="#FFE699" stop-opacity="0.95" />
@@ -564,9 +588,11 @@
                                     <stop offset="100%" stop-color="#818CF8" stop-opacity="0" />
                                 </linearGradient>
                             </defs>
-                            <path class="smoke-strand strand-1" d="M90,140 C75,120 85,95 68,65 C52,40 62,20 45,0" stroke="url(#magic-smoke-grad)" stroke-width="4.5" stroke-linecap="round" />
-                            <path class="smoke-strand strand-2" d="M90,140 C85,115 72,90 80,60 C88,35 75,15 85,-10" stroke="url(#magic-smoke-grad)" stroke-width="3.5" stroke-linecap="round" />
-                            <path class="smoke-strand strand-3" d="M90,140 C80,125 95,100 82,70 C72,45 78,25 68,0" stroke="url(#magic-smoke-grad)" stroke-width="2.8" stroke-linecap="round" />
+                            <path class="smoke-strand strand-1" d="M90,140 C60,110 30,90 10,60 C-10,35 -20,15 -30,-10" stroke="url(#magic-smoke-grad)" stroke-width="4.5" stroke-linecap="round" />
+                            <path class="smoke-strand strand-2" d="M90,140 C75,115 50,90 40,60 C30,35 25,15 20,-10" stroke="url(#magic-smoke-grad)" stroke-width="3.5" stroke-linecap="round" />
+                            <path class="smoke-strand strand-3" d="M90,140 C85,110 80,85 75,55 C70,30 65,15 60,-10" stroke="url(#magic-smoke-grad)" stroke-width="2.8" stroke-linecap="round" />
+                            <path class="smoke-strand strand-4" d="M90,140 C100,115 110,90 120,60 C130,35 140,15 150,-10" stroke="url(#magic-smoke-grad)" stroke-width="3.8" stroke-linecap="round" />
+                            <path class="smoke-strand strand-5" d="M90,140 C110,110 130,90 150,60 C170,35 190,15 210,-10" stroke="url(#magic-smoke-grad)" stroke-width="4.2" stroke-linecap="round" />
                         </svg>
                     </div>
                     
