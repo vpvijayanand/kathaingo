@@ -853,24 +853,20 @@
                                     },
 
                                     handleFormSubmit(event) {
-                                        // Sync TinyMCE content to textarea before native submit
                                         if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
                                             tinymce.get('content').save();
                                         }
-                                        this.showSubmitLoader = true;
-                                        event.target.submit();
+                                        submitPostFormViaAjax(event.target, this);
                                     },
 
                                     submitAnyway() {
                                         this.showWarningModal = false;
                                         this.isReviewed = true;
                                         this.hasMajorIssues = false;
-                                        // Sync TinyMCE content to textarea before native submit
                                         if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
                                             tinymce.get('content').save();
                                         }
-                                        this.showSubmitLoader = true;
-                                        document.getElementById('post-form').submit();
+                                        submitPostFormViaAjax(document.getElementById('post-form'), this);
                                     },
 
                                     reviewNow() {
@@ -1697,6 +1693,7 @@
         <div class="text-center">
             <p class="text-white text-xl font-bold tracking-wide">கட்டுரை பதிவேற்றப்படுகிறது...</p>
             <p class="text-burnt-orange text-sm font-semibold mt-1">Article is uploading, please wait</p>
+            <div id="upload-progress-text" class="text-4xl font-black text-burnt-orange mt-3">0%</div>
             <p class="text-gray-500 text-xs mt-3">சாளரத்தை மூடாதீர்கள் &middot; Do not close this window</p>
         </div>
         <div class="flex gap-2 mt-2">
@@ -1708,7 +1705,101 @@
 </div>
 
 <script>
-    document.getElementById('post-form').addEventListener('submit', function() {
+    async function compressImage(file, maxMegabytes = 1) {
+        if (!file || !file.type.match(/image\/(jpeg|png|webp)/)) return file;
+        if (file.size < maxMegabytes * 1024 * 1024) return file;
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const maxDim = 1920;
+                    if (width > height && width > maxDim) {
+                        height *= maxDim / width;
+                        width = maxDim;
+                    } else if (height > maxDim) {
+                        width *= maxDim / height;
+                        height = maxDim;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                    }, 'image/jpeg', 0.8);
+                };
+            };
+        });
+    }
+
+    async function submitPostFormViaAjax(formEl, alpineCtx) {
+        alpineCtx.showSubmitLoader = true;
         document.getElementById('submit-loader').style.display = 'flex';
-    });
+        const loaderText = document.getElementById('upload-progress-text');
+        if (loaderText) loaderText.innerText = '0%';
+
+        const formData = new FormData(formEl);
+        
+        // Compress featured_image if present
+        const imageInput = document.getElementById('featured_image');
+        if (imageInput && imageInput.files && imageInput.files.length > 0) {
+            const file = imageInput.files[0];
+            try {
+                const compressedFile = await compressImage(file, 1);
+                formData.set('featured_image', compressedFile);
+            } catch (e) {
+                console.error("Image compression failed", e);
+            }
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open(formEl.method || 'POST', formEl.action);
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                if (loaderText) {
+                    loaderText.innerText = percentComplete + '%';
+                }
+            }
+        };
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                if (xhr.responseURL) {
+                    window.location.href = xhr.responseURL;
+                } else {
+                    window.location.href = '{{ route("posts.index") }}';
+                }
+            } else if (xhr.status === 422) {
+                alpineCtx.showSubmitLoader = false;
+                document.getElementById('submit-loader').style.display = 'none';
+                let errors = JSON.parse(xhr.responseText).errors;
+                let errorMsg = 'Validation Error / சரிபார்ப்பு பிழை:\n\n';
+                for (let field in errors) {
+                    errorMsg += '- ' + errors[field][0] + '\n';
+                }
+                alert(errorMsg);
+            } else {
+                alpineCtx.showSubmitLoader = false;
+                document.getElementById('submit-loader').style.display = 'none';
+                alert('An unexpected error occurred. Please try again.');
+            }
+        };
+
+        xhr.onerror = function() {
+            alpineCtx.showSubmitLoader = false;
+            document.getElementById('submit-loader').style.display = 'none';
+            alert('Network error during upload.');
+        };
+
+        xhr.send(formData);
+    }
 </script>
