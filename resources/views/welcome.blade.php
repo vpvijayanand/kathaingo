@@ -122,76 +122,50 @@
             }
 
             .smoke-strand {
-                stroke-dasharray: 150;
-                stroke-dashoffset: 150;
-                filter: blur(5px);
-                transform-origin: bottom center;
-                transition: stroke-width 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+                stroke-dasharray: 300;
+                stroke-dashoffset: 300;
+                filter: blur(7px);
+                transform-origin: 50% 100%;
+                opacity: 0;
+                transition: filter 0.4s ease;
             }
 
             .strand-1 {
-                animation: smoke-flow-1 4.5s ease-in-out infinite;
+                animation: smoke-rise 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
             }
 
             .strand-2 {
-                animation: smoke-flow-2 5.5s ease-in-out infinite;
-                animation-delay: 1.2s;
+                animation: smoke-rise 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+                animation-delay: 1s;
             }
 
             .strand-3 {
-                animation: smoke-flow-3 6.5s ease-in-out infinite;
-                animation-delay: 2.5s;
-            }
-
-            @keyframes smoke-flow-1 {
-                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.8) translate(0, 0); }
-                15% { opacity: 0.85; }
-                80% { opacity: 0.25; }
-                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.3) translate(-20px, -35px); }
-            }
-
-            @keyframes smoke-flow-2 {
-                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.7) translate(0, 0); }
-                20% { opacity: 0.8; }
-                75% { opacity: 0.2; }
-                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.4) translate(-10px, -45px); }
-            }
-
-            @keyframes smoke-flow-3 {
-                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.9) translate(0, 0); }
-                10% { opacity: 0.9; }
-                85% { opacity: 0.3; }
-                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.2) translate(-30px, -25px); }
+                animation: smoke-rise 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+                animation-delay: 2s;
             }
 
             .strand-4 {
-                animation: smoke-flow-4 5s ease-in-out infinite;
+                animation: smoke-rise 5.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
                 animation-delay: 0.5s;
             }
 
             .strand-5 {
-                animation: smoke-flow-5 6s ease-in-out infinite;
-                animation-delay: 2s;
+                animation: smoke-rise 6.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+                animation-delay: 1.7s;
             }
 
-            @keyframes smoke-flow-4 {
-                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.85) translate(0, 0); }
-                15% { opacity: 0.85; }
-                80% { opacity: 0.25; }
-                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.35) translate(15px, -40px); }
-            }
-
-            @keyframes smoke-flow-5 {
-                0% { stroke-dashoffset: 150; opacity: 0; transform: scale(0.75) translate(0, 0); }
-                20% { opacity: 0.8; }
-                75% { opacity: 0.2; }
-                100% { stroke-dashoffset: 0; opacity: 0; transform: scale(1.25) translate(25px, -30px); }
+            @keyframes smoke-rise {
+                0%   { stroke-dashoffset: 300; opacity: 0;    transform: translateY(0px) scaleX(0.8); }
+                8%   { opacity: 0.6; }
+                40%  { opacity: 0.85; stroke-dashoffset: 150; transform: translateY(-18px) scaleX(1.2); }
+                70%  { opacity: 0.5; transform: translateY(-32px) scaleX(1.6); }
+                90%  { opacity: 0.15; }
+                100% { stroke-dashoffset: 0;   opacity: 0;    transform: translateY(-50px) scaleX(2.0); }
             }
 
             .treasure-lamp-container:hover .smoke-strand {
-                stroke-width: 4;
-                filter: blur(2px);
-                opacity: 0.95;
+                filter: blur(6px);
+                opacity: 0.9;
             }
 
             /* Active Transition Classes */
@@ -602,8 +576,8 @@
                     <div class="jewel-overlay" style="top: 55%; left: 55%;"></div>
                     <div class="jewel-overlay" style="top: 33%; left: 57%;"></div>
                     <div class="jewel-overlay" style="top: 65%; left: 45%;"></div>
-                    <div class="jewel-overlay" style="top: 50%; left: 68%;"></div>
-                    <div class="jewel-overlay" style="top: 72%; left: 38%;"></div>
+                    <div class="jewel-overlay" style="top: 48%; left: 64%;"></div>
+                    <div class="jewel-overlay" style="top: 73%; left: 38%;"></div>
                     
                 </a>
             </div>
