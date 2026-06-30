@@ -578,7 +578,7 @@
                         class="lamp-image w-[360px] md:w-[420px] h-auto object-contain select-none pointer-events-none transition-all duration-500 ease-out" />
                     
                     <!-- Smoke Overlay -->
-                    <div class="lamp-smoke-overlay" style="top: auto; bottom: 40%; left: 80%; transform: translateX(-50%) scale(2.2); transform-origin: bottom center;">
+                    <div class="lamp-smoke-overlay" style="top: auto; bottom: 40%; left: 70%; transform: translateX(-50%) scale(2.2); transform-origin: bottom center;">
                         <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
                             <defs>
                                 <linearGradient id="magic-smoke-grad" x1="50%" y1="100%" x2="50%" y2="0%">
