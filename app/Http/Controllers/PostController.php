@@ -240,7 +240,7 @@ class PostController extends Controller
             $previousChapter = Post::where('series_id', $post->series_id)
                 ->where('status', 'published')
                 ->where(function ($q) use ($post) {
-                    $q->where('chapter_number', '<', $post->chapter_number ?? PHP_INT_MAX)
+                    $q->where('chapter_number', '<', $post->chapter_number ?? 2147483647)
                       ->orWhere(function ($q2) use ($post) {
                           $q2->whereNull('chapter_number')
                              ->where('id', '<', $post->id);
