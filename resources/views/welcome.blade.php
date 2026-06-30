@@ -195,6 +195,45 @@
                 transform: scale(1.6) translate(-25px, -35px);
                 transition: all 0.9s cubic-bezier(0.25, 1, 0.5, 1);
             }
+
+            /* Glitter Animation */
+            .jewel-overlay {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background-color: white;
+                border-radius: 50%;
+                box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.9), 0 0 15px 4px rgba(242, 140, 40, 0.6);
+                opacity: 0;
+                animation: twinkle 2.5s infinite ease-in-out;
+                animation-delay: var(--glitter-delay, 0s);
+                pointer-events: none;
+                z-index: 15;
+            }
+            .jewel-overlay::after {
+                content: '';
+                position: absolute;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%) rotate(45deg);
+                width: 18px; height: 1.5px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 0 5px rgba(255,255,255,0.8);
+            }
+            .jewel-overlay::before {
+                content: '';
+                position: absolute;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                width: 18px; height: 1.5px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 0 5px rgba(255,255,255,0.8);
+            }
+            @keyframes twinkle {
+                0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+                50% { opacity: 1; transform: scale(1.2) rotate(45deg); box-shadow: 0 0 12px 4px rgba(255, 255, 255, 1), 0 0 25px 8px rgba(242, 140, 40, 0.9); }
+            }
         </style>
     </x-slot>
 
@@ -515,24 +554,30 @@
                         class="lamp-image w-[360px] md:w-[420px] h-auto object-contain select-none pointer-events-none transition-all duration-500 ease-out" />
                     
                     <!-- Smoke Overlay -->
-                    <div class="lamp-smoke-overlay">
+                    <div class="lamp-smoke-overlay" style="transform: translate(-100px, -110px) scale(1.8);">
                         <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="magic-smoke-grad" x1="50%" y1="100%" x2="50%" y2="0%">
                                     <stop offset="0%" stop-color="#FFE699" stop-opacity="0.95" />
-                                    <stop offset="35%" stop-color="#FDBA74" stop-opacity="0.65" />
-                                    <stop offset="70%" stop-color="#C084FC" stop-opacity="0.3" />
+                                    <stop offset="35%" stop-color="#FDBA74" stop-opacity="0.85" />
+                                    <stop offset="70%" stop-color="#C084FC" stop-opacity="0.5" />
                                     <stop offset="100%" stop-color="#818CF8" stop-opacity="0" />
                                 </linearGradient>
                             </defs>
-                            <path class="smoke-strand strand-1" d="M90,140 C75,120 85,95 68,65 C52,40 62,20 45,0" stroke="url(#magic-smoke-grad)" stroke-width="2.5" stroke-linecap="round" />
-                            <path class="smoke-strand strand-2" d="M90,140 C85,115 72,90 80,60 C88,35 75,15 85,-10" stroke="url(#magic-smoke-grad)" stroke-width="2.2" stroke-linecap="round" />
-                            <path class="smoke-strand strand-3" d="M90,140 C80,125 95,100 82,70 C72,45 78,25 68,0" stroke="url(#magic-smoke-grad)" stroke-width="1.8" stroke-linecap="round" />
+                            <path class="smoke-strand strand-1" d="M90,140 C75,120 85,95 68,65 C52,40 62,20 45,0" stroke="url(#magic-smoke-grad)" stroke-width="4.5" stroke-linecap="round" />
+                            <path class="smoke-strand strand-2" d="M90,140 C85,115 72,90 80,60 C88,35 75,15 85,-10" stroke="url(#magic-smoke-grad)" stroke-width="3.5" stroke-linecap="round" />
+                            <path class="smoke-strand strand-3" d="M90,140 C80,125 95,100 82,70 C72,45 78,25 68,0" stroke="url(#magic-smoke-grad)" stroke-width="2.8" stroke-linecap="round" />
                         </svg>
                     </div>
                     
 
                     <!-- Jewel Glows -->
+                    <div class="jewel-overlay" style="top: 45%; left: 35%;"></div>
+                    <div class="jewel-overlay" style="top: 55%; left: 55%;"></div>
+                    <div class="jewel-overlay" style="top: 35%; left: 60%;"></div>
+                    <div class="jewel-overlay" style="top: 65%; left: 45%;"></div>
+                    <div class="jewel-overlay" style="top: 48%; left: 68%;"></div>
+                    <div class="jewel-overlay" style="top: 72%; left: 38%;"></div>
                     
                 </a>
             </div>
