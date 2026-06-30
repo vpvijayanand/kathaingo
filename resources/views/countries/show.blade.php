@@ -94,7 +94,7 @@
                                 </div>
                             @else
                                 <div class="aspect-[16/9] rounded-lg overflow-hidden mb-3 bg-gray-855 border border-gray-800/80 flex items-center justify-center text-gray-500 text-xs relative">
-                                    <span>No Image</span>
+                                        <img src="{{ asset('images/logo/logo-header.png') }}" alt="Kathaingo" class="w-1/2 h-auto opacity-30 grayscale object-contain drop-shadow-md">
                                     @if($post->category)
                                         <span class="absolute top-2.5 left-2.5 px-2 py-0.5 bg-burnt-orange/90 text-white text-[9px] font-bold uppercase tracking-wider rounded-md backdrop-blur-sm shadow-md">
                                             {{ $post->category->name }}
