@@ -124,7 +124,7 @@
             .smoke-strand {
                 stroke-dasharray: 150;
                 stroke-dashoffset: 150;
-                filter: blur(3px);
+                filter: blur(5px);
                 transform-origin: bottom center;
                 transition: stroke-width 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
             }
@@ -578,7 +578,7 @@
                         class="lamp-image w-[360px] md:w-[420px] h-auto object-contain select-none pointer-events-none transition-all duration-500 ease-out" />
                     
                     <!-- Smoke Overlay -->
-                    <div class="lamp-smoke-overlay" style="top: auto; bottom: 40%; left: 70%; transform: translateX(-50%) scale(2.2); transform-origin: bottom center;">
+                    <div class="lamp-smoke-overlay" style="top: auto; bottom: 40%; left: 68%; transform: translateX(-50%) scale(2.2); transform-origin: bottom center;">
                         <svg class="smoke-svg" viewBox="0 0 100 150" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
                             <defs>
                                 <linearGradient id="magic-smoke-grad" x1="50%" y1="100%" x2="50%" y2="0%">
@@ -600,9 +600,9 @@
                     <!-- Jewel Glows -->
                     <div class="jewel-overlay" style="top: 45%; left: 35%;"></div>
                     <div class="jewel-overlay" style="top: 55%; left: 55%;"></div>
-                    <div class="jewel-overlay" style="top: 35%; left: 60%;"></div>
+                    <div class="jewel-overlay" style="top: 33%; left: 57%;"></div>
                     <div class="jewel-overlay" style="top: 65%; left: 45%;"></div>
-                    <div class="jewel-overlay" style="top: 48%; left: 68%;"></div>
+                    <div class="jewel-overlay" style="top: 50%; left: 68%;"></div>
                     <div class="jewel-overlay" style="top: 72%; left: 38%;"></div>
                     
                 </a>
