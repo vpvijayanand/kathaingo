@@ -572,12 +572,12 @@
                     
 
                     <!-- Jewel Glows -->
-                    <div class="jewel-overlay" style="top: 44%; left: 45%;"></div>
+                    <div class="jewel-overlay" style="top: 43%; left: 47%;"></div>
                     <div class="jewel-overlay" style="top: 55%; left: 55%;"></div>
-                    <div class="jewel-overlay" style="top: 31%; left: 52%;"></div>
-                    <div class="jewel-overlay" style="top: 63%; left: 47%;"></div>
-                    <div class="jewel-overlay" style="top: 50%; left: 64%;"></div>
-                    <div class="jewel-overlay" style="top: 73%; left: 38%;"></div>
+                    <div class="jewel-overlay" style="top: 29%; left: 47%;"></div>
+                    <div class="jewel-overlay" style="top: 61%; left: 47%;"></div>
+                    <div class="jewel-overlay" style="top: 52%; left: 64%;"></div>
+                    <div class="jewel-overlay" style="top: 71%; left: 38%;"></div>
                     
                 </a>
             </div>
