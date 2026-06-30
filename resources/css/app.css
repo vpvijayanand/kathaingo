@@ -259,24 +259,20 @@ body {
 .hero-desc {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.95));
-    -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.6);
 }
 
 .section-title {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-    -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.4);
 }
 
 .section-desc {
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
-    -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.3);
 }
 
 .stylish-desc {
     color: #f8fafc;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
-    -webkit-text-stroke: 0.4px rgba(0, 0, 0, 0.75);
     font-weight: 600;
     letter-spacing: 0.025em;
 }
