@@ -233,8 +233,6 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     display: inline;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
 }
 
 .hero-gradient {
@@ -256,7 +254,6 @@ body {
 
 .hero-title {
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
-    -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.85);
 }
 
 .hero-desc {
